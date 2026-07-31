@@ -1,0 +1,42 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: proxy-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - red-cba
+  db:
+    image: mysql:8.0
+    container_name: servidor-bd-082
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "5051:3306"
+    networks:
+      - red-cba
+
+  app:
+    image: samuelcr11/proyecto1-app:v1
+    container_name: mi_app_python
+    ports:
+      - "5050:5050"
+    depends_on:
+      - db
+    networks:
+      - red-cba
+    restart: unless-stopped
+
+networks:
+  red-cba:
+    name : red-cba
+
+volumes:
+  db_data:
+    name: db_data     

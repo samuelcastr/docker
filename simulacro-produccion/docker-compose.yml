@@ -1,0 +1,19 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: servidor-bd-082
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "5051:3306"
+
+  app:
+    image: samuelcr11/proyecto1-app:v1
+    container_name: mi_app_python
+    ports:
+      - "5050:5050"
+    depends_on:
+      - db
+    restart: unless-stopped

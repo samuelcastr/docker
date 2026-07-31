@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <title>Aplicación de muestra</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <h1>Centro de Biotecnología Agropecuaria</h1>
+    <h1>Me está llamando desde {{request.remote_addr}}</h1>
+    <h1>Me está llamando desde {{request.remote_addr}}</h1>
+    <p>{{ db_status }}</p>
+  </body>
+</html>
