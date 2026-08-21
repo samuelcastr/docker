@@ -24,3 +24,15 @@ jobs:
           context: .
           push: true
           tags: samuelcr11/proyecto1-app:latest
+
+      - name: desplegar en servidor cloud
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVE_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /home/samuel/cristian_dokcker/proyecto1
+            docker-compose down
+            docker-compose pull app
+            docker-compose up -d
