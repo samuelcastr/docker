@@ -53,6 +53,7 @@ jobs:
           username: ${{secrets.SERVER_USER}}
           key: ${{secrets.SERVER_SSH_KEY}}
           script: |
-            cd /home/ubuntu/docker 
+            cd /home/ubuntu/docker
+            git pull origin main
             docker compose pull app
             docker compose up -d

@@ -14,7 +14,7 @@ services:
       - red-proxy
 
   app:
-    image: samuelcr11/proyecto1-app:v1
+    image: samuelcr11/proyecto1-app:latest
     container_name: mi_app_python
     expose:
       - "5050"
