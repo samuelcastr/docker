@@ -32,6 +32,6 @@ jobs:
           username: ${{secrets.SERVER_USER}}
           key: ${{secrets.SERVER_SSH_KEY}}
           script: |
-            cd cristian_dokcker/proyecto1
-            docker-compose pull app
-            docker-compose up -d
+            cd /home/samuel/cristian_dokcker/proyecto1
+            docker compose pull app
+            docker compose up -d
