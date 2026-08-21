@@ -5,7 +5,7 @@ client = sample.test_client()
 
 def test_ruta_principal_responde_200():
     rv = client.get("/")
-    assert rv.status_code == 200
+    assert rv.status_code == 999
 
 
 def test_pagina_muestra_titulo():
