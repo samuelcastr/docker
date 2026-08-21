@@ -1,15 +1,31 @@
 services:
-  nginx:
-    image: nginx:alpine
-    container_name: proxy-nginx
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: proxy-npm-082
+    restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
+      - "81:81"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
     networks:
-      - red-cba
+      - red-proxy
+
+  app:
+    image: samuelcr11/proyecto1-app:v1
+    container_name: mi_app_python
+    expose:
+      - "5050"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - red-interna
+      - red-proxy
+    restart: unless-stopped
+
   db:
     image: mysql:8.0
     container_name: servidor-bd-082
@@ -17,26 +33,39 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-    ports:
-      - "5051:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
-      - red-cba
+      - red-interna
 
-  app:
-    image: samuelcr11/proyecto1-app:v1
-    container_name: mi_app_python
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
     ports:
-      - "5050:5050"
-    depends_on:
-      - db
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
     networks:
-      - red-cba
-    restart: unless-stopped
+      - red-interna
 
 networks:
-  red-cba:
-    name : red-cba
+  red-interna:
+    name: red-interna
+  red-proxy:
+    name: red-proxy
 
 volumes:
   db_data:
-    name: db_data     
+    name: db_data
+  npm_data:
+    name: npm_data
+  npm_letsencrypt:
+    name: npm_letsencrypt
+  uptime-kuma-data:
+    name: uptime-kuma-data
