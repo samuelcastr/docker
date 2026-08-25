@@ -26,8 +26,38 @@ jobs:
       - name: Ejecutar pruebas
         run: |
           pytest
+
+  sast-bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Instalar Bandit
+        run: pip install bandit
+
+      - name: Ejecutar Bandit
+        run: bandit -r . -f json -o bandit-report.json || true
+
+      - name: Verificar vulnerabilidades
+        run: bandit -r . --severity-level high
+
+  sast-trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Escanear imagen con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'python:3.8-slim-buster'
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
   build-and-push:
-    needs: test
+    needs: [test, sast-bandit, sast-trivy]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
