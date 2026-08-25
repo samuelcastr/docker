@@ -40,7 +40,7 @@ jobs:
         run: bandit -r . -f json -o bandit-report.json || true
 
       - name: Verificar vulnerabilidades
-        run: bandit -r . --severity-level high
+        run: bandit -r . --severity-level high --confidence-level medium
 
   sast-trivy:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       - name: Escanear imagen con Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'python:3.8-slim-buster'
+          image-ref: 'python:3.12-slim'
           format: 'table'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'

@@ -1,10 +1,10 @@
 from flask import Flask, render_template
 import pymysql
+import os
 
 sample = Flask(__name__)
 
-MYSQL_PASSWORD = "super_secret_123"
-API_KEY = "sk-1234567890abcdef"
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 
 @sample.route("/")
 def main():
@@ -12,7 +12,7 @@ def main():
         conn = pymysql.connect(
             host="db",
             user="root",
-            password="sena123",
+            password=DB_PASSWORD,
             database="082_db",
             port=3306
         )
@@ -21,7 +21,7 @@ def main():
     except Exception as e:
         db_status = f"Error al conectar a la base de datos: {e}"
 
-    return render_template("index.html", db_status=db_status), 500
+    return render_template("index.html", db_status=db_status)
 
 if __name__ == "__main__":
-    sample.run(host="0.0.0.0", port=5050, debug=True)
+    sample.run(host="0.0.0.0", port=5050)
