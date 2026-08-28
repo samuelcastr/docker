@@ -1,30 +1,19 @@
 services:
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: proxy-npm-082
-    restart: unless-stopped
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: proxy-manager
+    restart: always
     ports:
-      - "80:80"
-      - "443:443"
-      - "81:81"
+      - "80:80" #Http
+      - "81:81" #Administración de la API
+      - "443:443" #Https
     volumes:
-      - npm_data:/data
-      - npm_letsencrypt:/etc/letsencrypt
+      - ./npm_data:/data
+      - ./npm_letsencrypt:/etc/letsencryptalthy
+        
     networks:
-      - red-proxy
-
-  app:
-    image: samuelcr11/proyecto1-app:latest
-    container_name: mi_app_python
-    expose:
-      - "5050"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - red-interna
-      - red-proxy
-    restart: unless-stopped
+      - red-cba
+    
 
   db:
     image: mysql:8.0
@@ -33,17 +22,36 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-    volumes:
-      - db_data:/var/lib/mysql
+    ports:
+      - "5051:3306"
+    networks:
+      - red-cba
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
-      retries: 5
-    networks:
-      - red-interna
+      retries: 3
 
-  uptime-kuma:
+  app:
+    image: samuelcr11/proyecto1-app:v1
+    container_name: mi_app_python
+    ports:
+      - "5050:5050"
+    depends_on:
+      - db
+    networks:
+      - red-cba
+    restart: unless-stopped
+
+networks:
+  red-cba:
+    name : red-cba
+
+volumes:
+  db_data:
+    name: db_data     
+
+uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
     restart: always
@@ -52,20 +60,16 @@ services:
     volumes:
       - uptime-kuma-data:/app/data
     networks:
-      - red-interna
+      - red-interna  
 
-networks:
-  red-interna:
-    name: red-interna
-  red-proxy:
-    name: red-proxy
+dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+    networks:
+      - red-cba  
 
-volumes:
-  db_data:
-    name: db_data
-  npm_data:
-    name: npm_data
-  npm_letsencrypt:
-    name: npm_letsencrypt
-  uptime-kuma-data:
-    name: uptime-kuma-data
