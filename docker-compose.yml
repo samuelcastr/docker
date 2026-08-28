@@ -9,11 +9,10 @@ services:
       - "443:443" #Https
     volumes:
       - ./npm_data:/data
-      - ./npm_letsencrypt:/etc/letsencryptalthy
-        
+      - ./npm_letsencrypt:/etc/letsencrypt
+
     networks:
       - red-cba
-    
 
   db:
     image: mysql:8.0
@@ -43,15 +42,7 @@ services:
       - red-cba
     restart: unless-stopped
 
-networks:
-  red-cba:
-    name : red-cba
-
-volumes:
-  db_data:
-    name: db_data     
-
-uptime-kuma:
+  uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
     restart: always
@@ -60,9 +51,9 @@ uptime-kuma:
     volumes:
       - uptime-kuma-data:/app/data
     networks:
-      - red-interna  
+      - red-cba
 
-dozzle:
+  dozzle:
     image: amir20/dozzle:latest
     container_name: dozzle
     restart: always
@@ -71,5 +62,13 @@ dozzle:
     ports:
       - "8080:8080"
     networks:
-      - red-cba  
+      - red-cba
 
+networks:
+  red-cba:
+    name: red-cba
+
+volumes:
+  db_data:
+    name: db_data
+  uptime-kuma-data:
